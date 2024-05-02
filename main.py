@@ -1,4 +1,4 @@
-import tkinter, random
+import tkinter, random, time, threading
 
 # cria a janela
 window = tkinter.Tk()
@@ -56,10 +56,56 @@ class Functions:
     # faz o timer da rodada funcionar
     def timer():
         roundTime = 15 # tempo da rodada em segundos
-        if roundTime > 0:
+        while roundTime > 0:
             roundTime -= 1
             print(roundTime)
+            time.sleep(1)
         return roundTime
+
+    # rodar o looping
+    timerLoop = threading.Thread(target=timer)
+    timerLoop.start()
+
+    # funções para representar se o jogador acertou/errou a resposta, além de se o tempo se esgotou
+
+    # tela de acerto (caso o jogador acerte a reposta da pergunta)
+    def winScreen():
+        # remove todos os elementos da janela inicial
+        Functions.cleanWindow()
+        
+        # criação da janela
+        winCanvas = tkinter.Canvas(window, width=1280, height=720)
+        winCanvas.pack(fill="both", expand=True)
+
+        # adiciona a imagem de fundo
+        winScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
+        winScreenLabel = winCanvas.create_image(0, 0, image=winScreenImage, anchor="nw")
+
+    # tela de erro (caso o jogador erre a reposta da pergunta)
+    def loseScreen():
+        # remove todos os elementos da janela inicial
+        Functions.cleanWindow()
+        
+        # criação da janela
+        loseCanvas = tkinter.Canvas(window, width=1280, height=720)
+        loseCanvas.pack(fill="both", expand=True)
+
+        # adiciona a imagem de fundo
+        loseScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
+        loseScreenLabel = loseCanvas.create_image(0, 0, image=loseScreenImage, anchor="nw")
+
+    # tela de tempo (caso o jogador não responda em tempo hábil)
+    def timeOutScreen():
+        # remove todos os elementos da janela inicial
+        Functions.cleanWindow()
+        
+        # criação da janela
+        timeOutCanvas = tkinter.Canvas(window, width=1280, height=720)
+        timeOutCanvas.pack(fill="both", expand=True)
+
+        # adiciona a imagem de fundo
+        timeOutScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
+        timeOutScreenLabel = timeOutCanvas.create_image(0, 0, image=timeOutScreenImage, anchor="nw")
 
     def play():
         # remove todos os elementos da janela inicial
@@ -76,7 +122,7 @@ class Functions:
             player1Canvas.create_image(0,0, image=player1ScreenImage, anchor="nw")
 
             # temporizador
-            timerLabel = player1Canvas.create_text(639, 160, text=f"00:{Functions.timer()}", font=("System", 40), fill="#FFF7EC")
+            timerLabel = player1Canvas.create_text(639, 160, text=f"00:{Functions.timer}", font=("System", 40), fill="#FFF7EC")
 
             # placar
             player1ScoreLabel = player1Canvas.create_text(1100, 110, text=f"{Data.player1["pontos"]}", font=("System", 40), fill="#004AAD")
