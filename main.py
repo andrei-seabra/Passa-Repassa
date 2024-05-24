@@ -1,17 +1,18 @@
-import tkinter, random, time, threading
+import tkinter as tk
+import random
 
 # cria a janela
-window = tkinter.Tk()
+window = tk.Tk()
 # formatação da janela
 window.geometry("1280x720")
 window.title("Passa Repassa")
 window.configure(bg="white")
 
 class Data:
-    # perguntas e repostas
+    # perguntas e respostas
     questionsAnswers = {
         "Quem descobriu o Brasil?" : "pedro álvares cabral",
-       "Qual o maior time do futebol brasileiro?" : "flamengo"
+        "Qual o maior time do futebol brasileiro?" : "flamengo"
     }
 
     # dados dos jogadores
@@ -25,161 +26,138 @@ class Data:
         "inv" : ""
     }
 
-    # referência às imagens de fundo de cada jogador e às respetivas cores de botões // OBS: fzr um sistema que identifica de q jogador é a vez para mudar a imagem e a cor de referência dentro desse dictionary
+    # referência às imagens de fundo de cada jogador e às respectivas cores de botões
     playersScreens = {
         "player1" : ["Assets/Images/Player1Screen.png", "#0A3A7B"],
         "player2" : ["Assets/Images/Player2Screen.png", "#9D1C1C"]
-        }
-
-    player1Screen = playersScreens["player1"]
-    player1ScreenImage = player1Screen[0] # referência da imagem de fundo do jogador 1
-    player1ScreenColor = player1Screen[1] # referência da cor dos botões do jogador 1
-
-    player2Screen = playersScreens["player2"]
-    player2ScreenImage = player2Screen[0] # referência da imagem de fundo do jogador 2
-    player2ScreenColor = player2Screen[1] # referência da cor dos botões do jogador 2
+    }
 
     # rodadas
     matchRound = 1
 
 class Functions:
-    # remove todos os elementos da janela inicial
-    def cleanWindow():
-        for element in window.winfo_children():
-            element.destroy()
+    roundTime = 15  # Tempo da rodada em segundos
+    currentPlayer = "player1"
+    question = random.choice(list(Data.questionsAnswers.keys()))  # Escolhe uma pergunta aleatória no início
+    images = {}  # Dicionário para armazenar referências às imagens
 
-    # pega uma pergunta aleatória e sua respectiva resposta
+    @staticmethod
+    def update_timer(label):
+        if Functions.roundTime > 0:
+            Functions.roundTime -= 1
+            label.config(text=f"00:{Functions.roundTime:02d}")
+            window.after(1000, Functions.update_timer, label)
+        else:
+            Functions.timeOutScreen()  # Exibir tela de tempo esgotado
+
+    @staticmethod
     def getQuestion():
-        question = random.choice(list(Data.questionsAnswers.keys()))
-        return question
+        return Functions.question
 
-    # faz o timer da rodada funcionar
-    def timer():
-        roundTime = 15 # tempo da rodada em segundos
-        while roundTime > 0:
-            roundTime -= 1
-            print(roundTime)
-            time.sleep(1)
-        return roundTime
-
-    # rodar o looping
-    timerLoop = threading.Thread(target=timer)
-    timerLoop.start()
-
-    # funções para representar se o jogador acertou/errou a resposta, além de se o tempo se esgotou
-
-    # tela de acerto (caso o jogador acerte a reposta da pergunta)
-    def winScreen():
-        # remove todos os elementos da janela inicial
-        Functions.cleanWindow()
-        
-        # criação da janela
-        winCanvas = tkinter.Canvas(window, width=1280, height=720)
-        winCanvas.pack(fill="both", expand=True)
-
-        # adiciona a imagem de fundo
-        winScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
-        winScreenLabel = winCanvas.create_image(0, 0, image=winScreenImage, anchor="nw")
-
-    # tela de erro (caso o jogador erre a reposta da pergunta)
-    def loseScreen():
-        # remove todos os elementos da janela inicial
-        Functions.cleanWindow()
-        
-        # criação da janela
-        loseCanvas = tkinter.Canvas(window, width=1280, height=720)
-        loseCanvas.pack(fill="both", expand=True)
-
-        # adiciona a imagem de fundo
-        loseScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
-        loseScreenLabel = loseCanvas.create_image(0, 0, image=loseScreenImage, anchor="nw")
-
-    # tela de tempo (caso o jogador não responda em tempo hábil)
-    def timeOutScreen():
-        # remove todos os elementos da janela inicial
-        Functions.cleanWindow()
-        
-        # criação da janela
-        timeOutCanvas = tkinter.Canvas(window, width=1280, height=720)
-        timeOutCanvas.pack(fill="both", expand=True)
-
-        # adiciona a imagem de fundo
-        timeOutScreenImage = tkinter.PhotoImage(file="Assets/Images/WinScreen.png")
-        timeOutScreenLabel = timeOutCanvas.create_image(0, 0, image=timeOutScreenImage, anchor="nw")
-
+    @staticmethod
     def play():
-        # remove todos os elementos da janela inicial
         Functions.cleanWindow()
+        Functions.roundTime = 15  # Reinicia o temporizador a cada rodada
 
-        # função que que criam a tela da partida dos jogadores, indicado pela cor do fundo da imagem (azul = player1 e vermelho = player2), além de adicionar todos os elementos funcionais na tela como textos que se alteram, botões etc
         def playerScreen():
-            # criação da tela
-            player1Canvas = tkinter.Canvas(window, width=1280, height=720)
-            player1Canvas.pack(fill="both", expand=True)    
+            currentPlayerData = Data.playersScreens[Functions.currentPlayer]
+            playerCanvas = tk.Canvas(window, width=1280, height=720)
+            playerCanvas.pack(fill="both", expand=True)
+            playerScreenImage = tk.PhotoImage(file=currentPlayerData[0])
+            Functions.images['playerScreenImage'] = playerScreenImage  # Mantém a referência
+            playerCanvas.create_image(0, 0, image=playerScreenImage, anchor="nw")
 
-            # adiciona a imagem de fundo
-            player1ScreenImage = tkinter.PhotoImage(file=Data.player1ScreenImage) # referência da imagem de fundo de cada jogador
-            player1Canvas.create_image(0,0, image=player1ScreenImage, anchor="nw")
+            timerLabel = tk.Label(window, text=f"00:{Functions.roundTime:02d}", font=("System", 40), bg="white")
+            timerLabel.pack()
+            Functions.update_timer(timerLabel)  # Iniciar o temporizador
 
-            # temporizador
-            timerLabel = player1Canvas.create_text(639, 160, text=f"00:{Functions.timer}", font=("System", 40), fill="#FFF7EC")
+            questionLabel = playerCanvas.create_text(639, 250, text=f"{Functions.getQuestion()}", font=("System", 32), fill="#FFF7EC")
+            answerEntry = tk.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
+            playerCanvas.create_window(465, 360, width=325, height=51, anchor="nw", window=answerEntry)
 
-            # placar
-            player1ScoreLabel = player1Canvas.create_text(1100, 110, text=f"{Data.player1["pontos"]}", font=("System", 40), fill="#004AAD")
-            scoreLabel = player1Canvas.create_text(1130, 110, text="-", font=("System", 40), fill="#FFF7EC")
-            player2ScoreLabel = player1Canvas.create_text(1160, 110, text=f"{Data.player2["pontos"]}", font=("System", 40), fill="#D12424")
-
-            # pergunta
-            questionLabel = player1Canvas.create_text(639, 250, text=f"{Functions.getQuestion()}", font=("System", 32), fill="#FFF7EC")
-            # entrada de respostas
-            answerEntry = tkinter.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
-            answerEntryLabel = player1Canvas.create_window(465, 360, width=325, height= 51, anchor="nw", window=answerEntry)
-
-            # botão para enviar repostas
-            submitButtonImage = tkinter.PhotoImage(file="Assets/Images/SubmitArrow.png")
-            submitButton = tkinter.Button(window, border=0, bd=0, fg="#A8A39B", highlightbackground="#A8A39B", activebackground="#A8A39B", background="#A8A39B", image=submitButtonImage) # trocar a referência da cor em cada botão da tela, e nos abaixo também
-            submitButtonLabel = player1Canvas.create_window(800, 368, anchor="nw", window=submitButton)
-
-            # botões dos poderes e dica
-
-            # botão do poder de escudo (2° chance)
-            shieldButtonImage = tkinter.PhotoImage(file="Assets/Images/Shield.png") 
-            shieldButton = tkinter.Button(window, border=0, bd=0, fg="#0A3A7B", highlightbackground="#0A3A7B", activebackground="#0A3A7B", background="#0A3A7B", image=shieldButtonImage)
-            shieldButtonLabel = player1Canvas.create_window(1035, 580, anchor="nw", window=shieldButton)
-            shieldQuantityLabel = player1Canvas.create_text(1115, 650, text="0x", font=("System", 18), fill="#FFF7EC") # mostra a quantidade
-            # botão do poder de congelar o tempo
-            clockButtonImage = tkinter.PhotoImage(file="Assets/Images/Clock.png") 
-            clockButton = tkinter.Button(window, border=0, bd=0, fg="#0A3A7B", highlightbackground="#0A3A7B", activebackground="#0A3A7B", background="#0A3A7B", image=clockButtonImage)
-            clockButtonLabel = player1Canvas.create_window(928, 583, anchor="nw", window=clockButton)
-            clockQuantityLabel = player1Canvas.create_text(1005, 650, text="0x", font=("System", 18), fill="#FFF7EC") # mostra a quantidade
-            # botão do poder de ponto extra
-            rocketButtonImage = tkinter.PhotoImage(file="Assets/Images/Rocket.png") 
-            rocketButton = tkinter.Button(window, border=0, bd=0, fg="#0A3A7B", highlightbackground="#0A3A7B", activebackground="#0A3A7B", background="#0A3A7B", image=rocketButtonImage)
-            rocketButtonLabel = player1Canvas.create_window(1140, 583, anchor="nw", window=rocketButton)
-            rocketQuantityLabel = player1Canvas.create_text(1220, 650, text="0x", font=("System", 18), fill="#FFF7EC") # mostra a quantidade
-            # dica
-            tipButtonImage = tkinter.PhotoImage(file="Assets/Images/Lamp.png") 
-            tipButton = tkinter.Button(window, border=0, bd=0, fg="#0A3A7B", highlightbackground="#0A3A7B", activebackground="#0A3A7B", background="#0A3A7B", image=tipButtonImage)
-            tipButtonLabel = player1Canvas.create_window(89, 583, anchor="nw", window=tipButton)
-            tipQuantityLabel = player1Canvas.create_text(160, 650, text="0x", font=("System", 18), fill="#FFF7EC") # mostra a quantidade
-            # display do poder que foi ativado na rodada pelo jogador
-            powerDisplay = player1Canvas.create_image(142, 135, image=clockButtonImage, anchor="nw") # é só trocar a referência da imagem no 'image=' (dica: usar o msm path q já usei pros botões)
+            submitButtonImage = tk.PhotoImage(file="Assets/Images/SubmitArrow.png")
+            Functions.images['submitButtonImage'] = submitButtonImage  # Mantém a referência
+            submitButton = tk.Button(window, border=0, bd=0, fg=currentPlayerData[1], highlightbackground=currentPlayerData[1], activebackground=currentPlayerData[1], background=currentPlayerData[1], image=submitButtonImage, command=lambda: Functions.check_answer(answerEntry.get()))
+            playerCanvas.create_window(800, 368, anchor="nw", window=submitButton)
 
         playerScreen()
 
+    @staticmethod
+    def check_answer(answer):
+        correct_answer = Data.questionsAnswers[Functions.getQuestion()]
+
+        if answer.lower() == correct_answer:
+            Functions.update_score()
+            Functions.winScreen()
+        else:
+            Functions.loseScreen()
+
+    @staticmethod
+    def update_score():
+        if Functions.currentPlayer == "player1":
+            Data.player1["pontos"] += 1
+        else:
+            Data.player2["pontos"] += 1
+
+    @staticmethod
+    def switch_player():
+        if Functions.currentPlayer == "player1":
+            Functions.currentPlayer = "player2"
+        else:
+            Functions.currentPlayer = "player1"
+        Functions.question = random.choice(list(Data.questionsAnswers.keys()))  # Escolhe uma nova pergunta para o próximo jogador
+        Functions.play()
+
+    @staticmethod
+    def winScreen():
+        Functions.cleanWindow()
+        winCanvas = tk.Canvas(window, width=1280, height=720)
+        winCanvas.pack(fill="both", expand=True)
+        winScreenImage = tk.PhotoImage(file="Assets/Images/WinScreen.png")
+        Functions.images['winScreenImage'] = winScreenImage  # Mantém a referência
+        winCanvas.create_image(0, 0, image=winScreenImage, anchor="nw")
+        window.after(2000, Functions.switch_player)
+
+    @staticmethod
+    def loseScreen():
+        Functions.cleanWindow()
+        loseCanvas = tk.Canvas(window, width=1280, height=720)
+        loseCanvas.pack(fill="both", expand=True)
+        loseScreenImage = tk.PhotoImage(file="Assets/Images/LoseScreen.png")
+        Functions.images['loseScreenImage'] = loseScreenImage  # Mantém a referência
+        loseCanvas.create_image(0, 0, image=loseScreenImage, anchor="nw")
+        window.after(2000, Functions.switch_player)
+
+    @staticmethod
+    def timeOutScreen():
+        Functions.cleanWindow()
+        timeOutCanvas = tk.Canvas(window, width=1280, height=720)
+        timeOutCanvas.pack(fill="both", expand=True)
+        timeOutScreenImage = tk.PhotoImage(file="Assets/Images/TimeOutScreen.png")
+        Functions.images['timeOutScreenImage'] = timeOutScreenImage  # Mantém a referência
+        timeOutCanvas.create_image(0, 0, image=timeOutScreenImage, anchor="nw")
+        window.after(2000, Functions.switch_player)
+
+    @staticmethod
+    def cleanWindow():
+        for widget in window.winfo_children():
+            widget.destroy()
+
 class InicialMenu:
     # criação da tela
-    inicialMenuCanvas = tkinter.Canvas(window, width=1280, height=720)
+    inicialMenuCanvas = tk.Canvas(window, width=1280, height=720)
     inicialMenuCanvas.pack(fill="both", expand=True)
 
     # adiciona a imagem no fundo da tela
-    inicialMenuImage = tkinter.PhotoImage(file="Assets/Images/InicialMenu.png")
+    inicialMenuImage = tk.PhotoImage(file="Assets/Images/InicialMenu.png")
+    Functions.images['inicialMenuImage'] = inicialMenuImage  # Mantém a referência
     inicialMenuImageBackground = inicialMenuCanvas.create_image(0, 0, image=inicialMenuImage, anchor="nw")
 
     # adiciona o botão de jogar na tela
-    playButtonImage = tkinter.PhotoImage(file="Assets/Images/PlayButton.png")
-    playButton = tkinter.Button(window, image=playButtonImage, bd=0, fg="#004AAD", highlightbackground="#004AAD", activebackground="#004AAD", background="#004AAD", command=Functions.play)
-    playButtonLabel = inicialMenuCanvas.create_window(500, 350, anchor="nw", window=playButton)
+    playButtonImage = tk.PhotoImage(file="Assets/Images/PlayButton.png")
+    Functions.images['playButtonImage'] = playButtonImage  # Mantém a referência
+    playButton = tk.Button(window, image=playButtonImage, bd=0, fg="#004AAD", highlightbackground="#004AAD", activebackground="#004AAD", background="#004AAD", command=Functions.play)
+    inicialMenuCanvas.create_window(500, 350, anchor="nw", window=playButton)
 
 # roda a janela principal em looping
 window.mainloop()
