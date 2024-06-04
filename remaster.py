@@ -64,7 +64,7 @@ class InicialMenu:
     
     # add the background image of the inicial menu
     backgroundImage = tkinter.PhotoImage(file = "Assets/Images/InicialMenu.png")
-    backgroundLabel = canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
+    canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
 
     # create and format of the play button
     playButtonImage = tkinter.PhotoImage(file = "Assets/Images/PlayButton.png")
