@@ -9,6 +9,10 @@ class GameWindow:
     window.title("Passa Repassa")
     window.configure(bg="white")
 
+    # custom icon
+    icon = tkinter.PhotoImage(file = "Assets/Images/Logo.png")
+    window.iconphoto(False, icon)
+
 class MainCanvas:
     # game window
     window = GameWindow.window
@@ -44,14 +48,14 @@ class GameData:
                 }
     
 class CanvasManipulation:
-    # variables
-    canvas = MainCanvas.canvas
-    widgets = canvas.find_all()
-    
     # clean all the widgets of the main canvas
     def cleanCanvas():
+        # variables
+        canvas = MainCanvas.canvas
+        widgets = canvas.find_all()
+
         for widget in widgets:
-            widget.destroy()
+            canvas.delete(widget)
 
 class InicialMenu:
     # variables
@@ -64,9 +68,18 @@ class InicialMenu:
 
     # create and format of the play button
     playButtonImage = tkinter.PhotoImage(file = "Assets/Images/PlayButton.png")
-    playButton = tkinter.Button(window, bg = "blue", fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD", command = WindowManipulation.cleanCanvas(canvas))
+    playButton = tkinter.Button(window, image = playButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD", command = CanvasManipulation.cleanCanvas)
 
     # adds the play button to the canvas
     canvas.create_window(500, 350, anchor = "nw", window = playButton)
+
+class Match:
+    # variables
+    window = GameWindow.window
+    canvas = MainCanvas.canvas
+
+    def match():
+        ...
+    
 
 GameWindow.window.mainloop()
