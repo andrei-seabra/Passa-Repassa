@@ -7,7 +7,6 @@ class GameWindow:
     # window format
     window.geometry("1280x720")
     window.title("Passa Repassa")
-    window.configure(bg="white")
 
     # custom icon
     icon = tkinter.PhotoImage(file = "Assets/Images/Logo.png")
@@ -22,6 +21,12 @@ class MainCanvas:
     canvas.pack(fill = "both", expand = True)
 
 class GameData:
+    # questions and answer data
+    questionsAnswer = {
+        "Quem descobriu o Brasil?": "pedro álvares cabral",
+        "Qual o maior time do futebol brasileiro?" : "flamengo"
+    }
+
     # image references
     paths = {
         "backgroundImage" : [
@@ -43,30 +48,26 @@ class GameData:
         ]
     }
 
-    # questions and answer data
-    questionsAnswer = {
-        "Quem descobriu o Brasil?": "pedro álvares cabral",
-        "Qual o maior time do futebol brasileiro?" : "flamengo"
-    }
-
     # players data
-    player1 = {
+    players = {
+        "player1" : {
             "points" : 0,
-            "powerUps" : {
-                "shield" : 1,
-                "timeFreeze" : 1,
-                "doublePoints" : 1
-            }     
-                }
-    
-    player2 = {
+            "inv" : {
+                "shield" : 0,
+                "timeFreezer" : 0,
+                "doublePoints" : 0
+            }
+        },
+
+        "player2" : {
             "points" : 0,
-            "powerUps" : {
-                "shield" : 1,
-                "timeFreeze" : 1,
-                "doublePoints" : 1
-            }     
-                }
+            "inv" : {
+                "shield" : 0,
+                "timeFreezer" : 0,
+                "doublePoints" : 0
+            }
+        }
+    }
     
 class CanvasManipulation:
     # variables
@@ -78,25 +79,23 @@ class CanvasManipulation:
         canvas = MainCanvas.canvas
         widgets = canvas.find_all()
 
+        # loop to delete every widget of the screen
         for widget in widgets:
             canvas.delete(widget)
 
-class Match:
-    # screen classes
-    class PlayerScreen:
-        def __init__(self):
-            print("player screen")
-            # variables
-            window = GameWindow.window
-            canvas = MainCanvas.canvas
-            paths = GameData.paths
-
-            player1Screen = paths["backgroundImage"][1]
-            player2Screen = paths["backgroundImage"][2]
+ # screen classes
+class PlayerScreen:
+    def __init__(self, playerBackgroundImage):
+        # variables
+        canvas = MainCanvas.canvas
         
-            # add the background image
-            backgroundImage = tkinter.PhotoImage(file = player1Screen)
-            self.canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
+        # add the background image
+        self.backgroundImage = tkinter.PhotoImage(file = playerBackgroundImage)
+        canvas.create_image(0, 0, anchor = "nw", image = self.backgroundImage)
+
+class Match:
+    #variables
+
 
     # functions
     def timeHandler():
@@ -108,7 +107,14 @@ class Match:
             print(i)
 
     def matchHandler():
-        playerScreen = Match.PlayerScreen()
+        # variables
+        paths = GameData.paths
+
+        player1Background = paths["backgroundImage"][1]
+        player2Background = paths["backgroundImage"][2]
+
+        # creates the player screen instances
+        playerScreen = PlayerScreen(playerBackgroundImage = player1Background)
 
         CanvasManipulation.canvasCleaner()
         Match.timeHandler()
