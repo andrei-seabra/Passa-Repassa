@@ -93,12 +93,22 @@ class PlayerScreen:
         # cleans the canvas
         CanvasManipulation.canvasCleaner()
 
+        # widgets
+
         # add the background image
         backgroundImage = tkinter.PhotoImage(file = playerBackgroundImage)
         canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
         
-        canvas.create_text(0, 0, anchor="nw", text = f"00:{roundTime}")
+        # timer display
+        canvas.create_text(0, 0, anchor="nw",font = ("System", 40), fill = "white", text = f"00:{roundTime}")
         
+        # question display
+        canvas.create_text(0, 0, anchor="nw",font = ("System", 32), fill = "white", text = f"Quem descobriu o Brasil?")
+
+        # answer entry
+        answerEntry = tkinter.Entry(window, border = 0, bd = 0, fill = "black", font = ("System", 20), highlightbackground = "#FFF7EC", background = "#FFF7EC")
+        canvas.create_window(465, 360, width = 325, height = 51, anchor = "nw", window = answerEntry)
+
 class Match:
     #variables
 
