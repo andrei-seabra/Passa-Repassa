@@ -85,14 +85,20 @@ class CanvasManipulation:
 
  # screen classes
 class PlayerScreen:
-    def __init__(self, playerBackgroundImage):
+    def playerScreenHandler(playerBackgroundImage, roundTime):
         # variables
         canvas = MainCanvas.canvas
+        window = GameWindow.window
         
-        # add the background image
-        self.backgroundImage = tkinter.PhotoImage(file = playerBackgroundImage)
-        canvas.create_image(0, 0, anchor = "nw", image = self.backgroundImage)
+        # cleans the canvas
+        CanvasManipulation.canvasCleaner()
 
+        # add the background image
+        backgroundImage = tkinter.PhotoImage(file = playerBackgroundImage)
+        canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
+        
+        canvas.create_text(0, 0, anchor="nw", text = f"00:{roundTime}")
+        
 class Match:
     #variables
 
@@ -114,9 +120,8 @@ class Match:
         player2Background = paths["backgroundImage"][2]
 
         # creates the player screen instances
-        playerScreen = PlayerScreen(playerBackgroundImage = player1Background)
+        PlayerScreen.playerScreenHandler(player1Background, 15)
 
-        CanvasManipulation.canvasCleaner()
         Match.timeHandler()
 
 class InicialMenu:
@@ -128,7 +133,7 @@ class InicialMenu:
     # add the background image
     backgroundImage = tkinter.PhotoImage(file = paths["backgroundImage"][0])
     canvas.create_image(0, 0, anchor = "nw", image = backgroundImage)
-
+    
     # create and format the play button
     playButtonImage = tkinter.PhotoImage(file = paths["icons"][0])
     playButton = tkinter.Button(window, image = playButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD", command = Match.matchHandler)
