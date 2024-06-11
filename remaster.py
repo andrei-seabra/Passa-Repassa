@@ -148,9 +148,13 @@ class PlayerScreen:
 
         # double points power up button
         doublePointsButtonImage = tkinter.PhotoImage(file = paths["icons"][3])
+        doublePointsButtonImage.data()
         doublePointsButton = tkinter.Button(window, image = doublePointsButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD")
 
         canvas.create_window(1200, 600, anchor = "nw", window = doublePointsButton)
+
+        # updates the images into the canvas
+        canvas.pack()
 
 class EndingScreen:
     def endingScreenHandler(backgroundImage):
@@ -163,6 +167,9 @@ class EndingScreen:
         # adds the background image to the screen
         endingBackgroundImage = tkinter.PhotoImage(file = backgroundImage)
         canvas.create_image(0, 0, anchor = "nw", image = endingBackgroundImage)
+
+        # updates the images into the canvas
+        canvas.pack()
 
 class Match:
     #variables
