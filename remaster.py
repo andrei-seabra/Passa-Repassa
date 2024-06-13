@@ -43,9 +43,14 @@ class GameData:
             "Assets/Images/Shield.png",
             "Assets/Images/Rocket.png",
             "Assets/Images/Clock.png",
-            "Assets/Images/Lamp.png",
             "Assets/Images/SubmitArrow.png"
         ]
+    }
+
+    # colors references
+    backgroundColors = {
+        "player1" : "#004AAD",
+        "player2" : "#D12424"
     }
 
     # players data
@@ -85,7 +90,7 @@ class CanvasManipulation:
 
  # screen classes
 class PlayerScreen:
-    def playerScreenHandler(playerBackgroundImage, powerUpImage, roundTime):
+    def playerScreenHandler(playerBackgroundImage, powerUpImage, backgroundColor, roundTime, qtyShield, qtyFrezzer, qtyDoublePoints):
         # variables
         canvas = MainCanvas.canvas
         window = GameWindow.window
@@ -109,6 +114,7 @@ class PlayerScreen:
         canvas.create_text(570, 130, anchor="nw", font = ("System", 40), fill = "white", text = f"00:{roundTime}")
 
         # score display
+
         # player1 score display
         canvas.create_text(1080, 75, anchor = "nw", font = ("System", 40), fill = "#004AAD", text = f"0")
         # division display
@@ -124,37 +130,49 @@ class PlayerScreen:
 
         # answer entry
         answerEntry = tkinter.Entry(window, border = 0, bd = 0, fg = "black", font = ("System", 20), highlightbackground = "#FFF7EC", background = "#FFF7EC")
-        canvas.create_window(465, 360, width = 325, height = 51, anchor = "nw", window = answerEntry)
+        canvas.create_window(465, 360, width = 325, height = 50, anchor = "nw", window = answerEntry)
 
         # submit button
-        submitButtonImage = tkinter.PhotoImage(file = paths["icons"][5])
-        submitButton = tkinter.Button(window, image = submitButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD")
+        submitButtonImage = tkinter.PhotoImage(file = paths["icons"][4])
+        submitButton = tkinter.Button(window, image = submitButtonImage, bd = 0, activebackground = "#A8A39B", background = "#A8A39B")
 
-        canvas.create_window(800, 365, anchor = "nw", window = submitButton)
+        # adds the button to the canvas
+        canvas.create_window(799, 368, anchor = "nw", window = submitButton)
 
         # power ups buttons
 
         # shield power up button
         shieldButtonImage = tkinter.PhotoImage(file = paths["icons"][1])
-        shieldButton = tkinter.Button(window, image = shieldButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD")
+        shieldButton = tkinter.Button(window, image = shieldButtonImage, bd = 0, activebackground = "#0A3A7B", background = "#0A3A7B")
 
-        canvas.create_window(1000, 600, anchor = "nw", window = shieldButton)
+        # adds the button to the canvas
+        canvas.create_window(930, 583, anchor = "nw", window = shieldButton)
+
+        # quantity display
+        canvas.create_text(980, 630, anchor = "nw", font = ("System", 20), fill = "white", text = f"x{qtyShield}")
 
         # freeze time power up button
         freezeTimeButtonImage = tkinter.PhotoImage(file = paths["icons"][3])
-        freezeTimeButton = tkinter.Button(window, image = submitButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD")
+        freezeTimeButton = tkinter.Button(window, image = freezeTimeButtonImage, bd = 0, activebackground = "#0A3A7B", background = "#0A3A7B")
 
-        canvas.create_window(1100, 600, anchor = "nw", window = freezeTimeButton)
+        # adds the button to the canvas
+        canvas.create_window(1035, 583, anchor = "nw", window = freezeTimeButton)
+
+        # quantity display
+        canvas.create_text(1085, 630, anchor = "nw", font = ("System", 20), fill = "white", text = f"x{qtyFrezzer}")
 
         # double points power up button
-        doublePointsButtonImage = tkinter.PhotoImage(file = paths["icons"][3])
-        doublePointsButtonImage.data()
-        doublePointsButton = tkinter.Button(window, image = doublePointsButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD")
+        doublePointsButtonImage = tkinter.PhotoImage(file = paths["icons"][2])
+        doublePointsButton = tkinter.Button(window, image = doublePointsButtonImage, bd = 0, activebackground = "#0A3A7B", background = "#0A3A7B")
 
-        canvas.create_window(1200, 600, anchor = "nw", window = doublePointsButton)
+        # adds the button to the canvas
+        canvas.create_window(1143, 583, anchor = "nw", window = doublePointsButton)
+
+        # quantity display
+        canvas.create_text(1190, 630, anchor = "nw", font = ("System", 20), fill = "white", text = f"x{qtyDoublePoints}")
 
         # updates the images into the canvas
-        canvas.pack()
+        canvas.mainloop() # rever essa parte
 
 class EndingScreen:
     def endingScreenHandler(backgroundImage):
@@ -184,16 +202,17 @@ class Match:
         for i in range(roundTime, -1, -1):
             print(i)
 
-    def matchHandler():
+    def matchHandler(): # debuger
         # variables
         paths = GameData.paths
+        colors = GameData.backgroundColors
 
         player1Background = paths["backgroundImage"][1]
         player2Background = paths["backgroundImage"][2]
         clockIcon = paths["icons"][3]
 
         # creates the player screen instances
-        PlayerScreen.playerScreenHandler(player1Background, clockIcon, 15)
+        PlayerScreen.playerScreenHandler(player1Background, clockIcon, colors["player1"],  15, 0, 0, 0)
 
         Match.timeHandler()
 
@@ -209,7 +228,7 @@ class InicialMenu:
     
     # create and format the play button
     playButtonImage = tkinter.PhotoImage(file = paths["icons"][0])
-    playButton = tkinter.Button(window, image = playButtonImage, bd = 0, fg = "#004AAD", highlightbackground = "#004AAD", activebackground = "#004AAD", background = "#004AAD", command = Match.matchHandler)
+    playButton = tkinter.Button(window, image = playButtonImage, bd = 0, activebackground = "#004AAD", background = "#004AAD", command = Match.matchHandler)
 
     # adds the play button to the canvas
     canvas.create_window(500, 350, anchor = "nw", window = playButton)
