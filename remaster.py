@@ -1,207 +1,241 @@
 import tkinter as tk
 import random
 
-class GameWindow:
-    def __init__(self):
-        self.window = tk.Tk()
-        self.window.geometry("1280x720")
-        self.window.title("Passa Repassa")
-        self.icon = tk.PhotoImage(file="Assets/Images/Logo.png")
-        self.window.iconphoto(False, self.icon)
+# Criação da janela principal do jogo
+window = tk.Tk()
+window.geometry("1280x720")
+window.title("Passa Repassa")
 
-class MainCanvas:
-    def __init__(self, window):
-        self.canvas = tk.Canvas(window, width=1280, height=720)
-        self.canvas.pack(fill="both", expand=True)
+# Ícone personalizado
+icon = tk.PhotoImage(file="Assets/Images/Logo.png")
+window.iconphoto(False, icon)
 
-class GameData:
-    questionsAnswer = {
-        "Quem descobriu o Brasil?": "pedro álvares cabral",
-        "Qual o maior time do futebol brasileiro?": "flamengo",
-        # Adicione mais perguntas e respostas aqui
-    }
+# Criação do canvas principal
+canvas = tk.Canvas(window, width=1280, height=720)
+canvas.pack(fill="both", expand=True)
 
-    paths = {
-        "backgroundImage": [
-            "Assets/Images/InicialMenu.png",
-            "Assets/Images/Player1Screen.png",
-            "Assets/Images/Player2Screen.png",
-            "Assets/Images/TimeOutScreen.png",
-            "Assets/Images/LoseScreen.png",
-            "Assets/Images/WinScreen.png"
-        ],
-        "icons": [
-            "Assets/Images/PlayButton.png",
-            "Assets/Images/Shield.png",
-            "Assets/Images/Rocket.png",
-            "Assets/Images/Clock.png",
-            "Assets/Images/SubmitArrow.png"
-        ]
-    }
+# Dados do jogo
+questions_answers = {
+    "Quem descobriu o Brasil?": "pedro álvares cabral",
+    "Qual o maior time do futebol brasileiro?": "flamengo"
+}
 
-    backgroundColors = {
-        "player1": "#004AAD",
-        "player2": "#D12424"
-    }
+# Referências de imagens
+paths = {
+    "backgroundImage": [
+        "Assets/Images/InicialMenu.png",
+        "Assets/Images/Player1Screen.png",
+        "Assets/Images/Player2Screen.png",
+        "Assets/Images/TimeOutScreen.png",
+        "Assets/Images/LoseScreen.png",
+        "Assets/Images/WinScreen.png"
+    ],
+    "icons": [
+        "Assets/Images/PlayButton.png",
+        "Assets/Images/Shield.png",
+        "Assets/Images/Rocket.png",
+        "Assets/Images/Clock.png",
+        "Assets/Images/SubmitArrow.png"
+    ]
+}
 
-    players = {
-        "player1": {
-            "points": 0,
-            "inv": {
-                "shield": 0,
-                "timeFreezer": 0,
-                "doublePoints": 0
-            }
+# Referências de cores
+background_colors = {
+    "player1": "#004AAD",
+    "player2": "#D12424"
+}
+
+# Dados dos jogadores
+players = {
+    "player1": {
+        "points": 0,
+        "inv": {
+            "shield": 0,
+            "timeFreezer": 0,
+            "doublePoints": 0
         },
-        "player2": {
-            "points": 0,
-            "inv": {
-                "shield": 0,
-                "timeFreezer": 0,
-                "doublePoints": 0
-            }
-        }
+        "shield_active": False,
+        "double_points_active": False,
+        "time_freeze_active": False
+    },
+    "player2": {
+        "points": 0,
+        "inv": {
+            "shield": 0,
+            "timeFreezer": 0,
+            "doublePoints": 0
+        },
+        "shield_active": False,
+        "double_points_active": False,
+        "time_freeze_active": False
     }
+}
 
-class CanvasManipulation:
-    @staticmethod
-    def canvasCleaner(canvas):
-        widgets = canvas.find_all()
-        for widget in widgets:
-            canvas.delete(widget)
+current_player = "player1"
+current_question_index = 0
+questions = list(questions_answers.keys())
+time_left = 15
+timer_running = True
+timer_id = None
 
-class EndingScreen:
-    @staticmethod
-    def endingScreenHandler(canvas, backgroundImage, nextHandler):
-        CanvasManipulation.canvasCleaner(canvas)
-        endingBackgroundImage = tk.PhotoImage(file=backgroundImage)
-        canvas.backgroundImage = endingBackgroundImage  # Referência para evitar coleta de lixo
-        canvas.create_image(0, 0, anchor="nw", image=endingBackgroundImage)
-        canvas.pack()
-        canvas.after(2000, nextHandler)  # Espera 2 segundos antes de chamar o próximo handler
+def canvas_cleaner():
+    widgets = canvas.find_all()
+    for widget in widgets:
+        canvas.delete(widget)
 
-class PlayerScreen:
-    @staticmethod
-    def playerScreenHandler(canvas, window, playerBackgroundImage, powerUpImage, backgroundColor, roundTime, qtyShield, qtyFrezzer, qtyDoublePoints, player):
-        CanvasManipulation.canvasCleaner(canvas)
-        backgroundImage = tk.PhotoImage(file=playerBackgroundImage)
-        canvas.backgroundImage = backgroundImage  # Referência para evitar coleta de lixo
-        canvas.create_image(0, 0, anchor="nw", image=backgroundImage)
+def format_time(seconds):
+    minutes = seconds // 60
+    seconds = seconds % 60
+    return f"{minutes:02}:{seconds:02}"
 
-        question = random.choice(list(GameData.questionsAnswer.keys()))
-        canvas.current_question = question  # Salva a pergunta atual no canvas para uso posterior
-        canvas.create_text(400, 250, anchor="nw", font=("System", 32), fill="white", text=question)
-        canvas.timer_text = canvas.create_text(570, 130, anchor="nw", font=("System", 40), fill="white", text=f"00:{roundTime}")
-        canvas.create_text(1080, 75, anchor="nw", font=("System", 40), fill="#004AAD", text=f"{GameData.players['player1']['points']}")
-        canvas.create_text(1125, 75, anchor="nw", font=("System", 40), fill="white", text="-")
-        canvas.create_text(1150, 75, anchor="nw", font=("System", 40), fill="#D12424", text=f"{GameData.players['player2']['points']}")
+def player_screen(player, time_left):
+    global timer_running
+    timer_running = True
+    canvas_cleaner()
+    
+    # Add the background image
+    bg_index = 1 if player == "player1" else 2
+    background_image = tk.PhotoImage(file=paths["backgroundImage"][bg_index])
+    canvas.background_image = background_image  # Prevent garbage collection
+    canvas.create_image(0, 0, anchor="nw", image=background_image)
+    
+    # Add question text
+    canvas.create_text(400, 250, anchor="nw", font=("System", 32), fill="white", text=questions[current_question_index])
+    
+    # Add player scores
+    canvas.create_text(1080, 75, anchor="nw", font=("System", 40), fill="#004AAD", text=str(players["player1"]["points"]))
+    canvas.create_text(1125, 75, anchor="nw", font=("System", 40), fill="white", text="-")
+    canvas.create_text(1150, 75, anchor="nw", font=("System", 40), fill="#D12424", text=str(players["player2"]["points"]))
+    
+    # Add power up display
+    power_up_image = tk.PhotoImage(file=paths["icons"][3])  # Ícone do relógio (Clock.png)
+    canvas.power_up_image = power_up_image  # Prevent garbage collection
+    canvas.create_image(142, 135, anchor="nw", image=power_up_image)
+    
+    # Add answer entry
+    answer_entry = tk.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
+    canvas.create_window(465, 360, width=325, height=50, anchor="nw", window=answer_entry)
+    
+    # Add submit button
+    submit_button_image = tk.PhotoImage(file=paths["icons"][4])
+    submit_button = tk.Button(window, image=submit_button_image, bd=0, activebackground="#A8A39B", background="#A8A39B", command=lambda: submit_answer(answer_entry.get()))
+    submit_button.image = submit_button_image  # Prevent garbage collection
+    canvas.create_window(799, 368, anchor="nw", window=submit_button)
+    
+    # Add power up buttons and quantities
+    icons_positions = [(930, 583), (1035, 583), (1140, 583)]
+    for i, icon in enumerate(paths["icons"][1:4]):
+        power_name = list(players[player]['inv'].keys())[i]
+        power_up_image = tk.PhotoImage(file=icon)
+        power_up_button = tk.Button(window, image=power_up_image, bd=0, activebackground="#0A3A7B", background="#0A3A7B", command=lambda p=player, pw=power_name: use_power_up(p, pw))
+        power_up_button.image = power_up_image  # Prevent garbage collection
+        canvas.create_window(icons_positions[i][0], icons_positions[i][1], anchor="nw", window=power_up_button)
+        power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+    
+    update_timer(time_left)
 
-        powerUpImageDisplay = tk.PhotoImage(file=powerUpImage)
-        canvas.powerUpImageDisplay = powerUpImageDisplay  # Referência para evitar coleta de lixo
-        canvas.create_image(142, 135, anchor="nw", image=powerUpImageDisplay)
+def update_timer(time_left):
+    global timer_running, timer_id
+    if time_left >= 0 and timer_running:
+        timer_text = format_time(time_left)
+        canvas_cleaner_text("timer_text")
+        canvas.create_text(570, 130, anchor="nw", font=("System", 40), fill="white", text=timer_text, tag="timer_text")
+        timer_id = canvas.after(1000, update_timer, time_left - 1)
+    elif time_left < 0:
+        end_round("time_out")
 
-        answerEntry = tk.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
-        canvas.create_window(465, 360, width=325, height=50, anchor="nw", window=answerEntry)
+def canvas_cleaner_text(item):
+    canvas.delete(item)
 
-        submitButtonImage = tk.PhotoImage(file=GameData.paths["icons"][4])
-        submitButton = tk.Button(window, image=submitButtonImage, bd=0, activebackground="#A8A39B", background="#A8A39B",
-                                 command=lambda: PlayerScreen.checkAnswer(canvas, window, answerEntry, player))
-        submitButton.image = submitButtonImage  # Referência para evitar coleta de lixo
-        canvas.create_window(799, 368, anchor="nw", window=submitButton)
-
-        shieldButtonImage = tk.PhotoImage(file=GameData.paths["icons"][1])
-        shieldButton = tk.Button(window, image=shieldButtonImage, bd=0, activebackground="#0A3A7B", background="#0A3A7B")
-        shieldButton.image = shieldButtonImage  # Referência para evitar coleta de lixo
-        canvas.create_window(930, 583, anchor="nw", window=shieldButton)
-        canvas.create_text(980, 630, anchor="nw", font=("System", 20), fill="white", text=f"x{qtyShield}")
-
-        freezeTimeButtonImage = tk.PhotoImage(file=GameData.paths["icons"][3])
-        freezeTimeButton = tk.Button(window, image=freezeTimeButtonImage, bd=0, activebackground="#0A3A7B", background="#0A3A7B")
-        freezeTimeButton.image = freezeTimeButtonImage  # Referência para evitar coleta de lixo
-        canvas.create_window(1035, 583, anchor="nw", window=freezeTimeButton)
-        canvas.create_text(1085, 630, anchor="nw", font=("System", 20), fill="white", text=f"x{qtyFrezzer}")
-
-        doublePointsButtonImage = tk.PhotoImage(file=GameData.paths["icons"][2])
-        doublePointsButton = tk.Button(window, image=doublePointsButtonImage, bd=0, activebackground="#0A3A7B", background="#0A3A7B")
-        doublePointsButton.image = doublePointsButtonImage  # Referência para evitar coleta de lixo
-        canvas.create_window(1143, 583, anchor="nw", window=doublePointsButton)
-        canvas.create_text(1190, 630, anchor="nw", font=("System", 20), fill="white", text=f"x{qtyDoublePoints}")
-
-        PlayerScreen.start_timer(canvas, window, roundTime, player)
-
-    @staticmethod
-    def start_timer(canvas, window, time_left, player):
-        canvas.after_cancel(canvas.timer) if hasattr(canvas, 'timer') else None  # Cancela o timer anterior se existir
-        PlayerScreen.update_timer(canvas, window, time_left, player)
-
-    @staticmethod
-    def update_timer(canvas, window, time_left, player):
-        if time_left >= 0:
-            minutes = time_left // 60
-            seconds = time_left % 60
-            time_formatted = f"{minutes:02}:{seconds:02}"
-            canvas.itemconfig(canvas.timer_text, text=time_formatted)
-            canvas.timer = window.after(1000, PlayerScreen.update_timer, canvas, window, time_left - 1, player)
+def submit_answer(answer):
+    correct_answer = questions_answers[questions[current_question_index]]
+    if answer.lower() == correct_answer:
+        points_to_add = 2 if players[current_player]["double_points_active"] else 1
+        if players[current_player]["time_freeze_active"]:
+            players[current_player]["time_freeze_active"] = False
+            resume_time()  # Reinicia o temporizador se congelado
+        if players[current_player]["points"] >= players["player2"]["points"]:
+            players[current_player]["points"] += points_to_add
+        players[current_player]["double_points_active"] = False
+        give_random_power(current_player)
+        end_round("win")
+    else:
+        if players[current_player]["shield_active"]:
+            players[current_player]["shield_active"] = False
+            end_round("protected")
         else:
-            PlayerScreen.next_player(canvas, window, player, "time")
+            end_round("lose")
 
-    @staticmethod
-    def checkAnswer(canvas, window, entry, player):
-        answer = entry.get().strip().lower()
-        question = canvas.current_question
-        correct_answer = GameData.questionsAnswer[question].strip().lower()
-        if answer == correct_answer:
-            PlayerScreen.next_player(canvas, window, player, "win")
-        else:
-            PlayerScreen.next_player(canvas, window, player, "lose")
+def give_random_power(player):
+    power = random.choice(list(players[player]["inv"].keys()))
+    players[player]["inv"][power] += 1
 
-    @staticmethod
-    def next_player(canvas, window, current_player, result):
-        next_player = "player2" if current_player == "player1" else "player1"
-        if result == "win":
-            GameData.players[current_player]["points"] += 1
+def use_power_up(player, power):
+    global timer_running, timer_id
+    if players[player]['inv'][power] > 0:
+        players[player]['inv'][power] -= 1
+        if power == 'shield':
+            players[player]['shield_active'] = True
+        elif power == 'timeFreezer':
+            if not players[player]['time_freeze_active']:
+                players[player]['time_freeze_active'] = True
+                timer_running = False
+                canvas.after_cancel(timer_id)
+                canvas.create_text(640, 360, anchor="center", font=("System", 32), fill="red", text="Tempo Congelado!", tag="freeze_message")
+        elif power == 'doublePoints':
+            players[player]['double_points_active'] = True
+        update_player_inventory(player)
 
-        background_index = {
-            "player1": 1,
-            "player2": 2,
-            "time": 3,
-            "lose": 4,
-            "win": 5
-        }
+def update_player_inventory(player):
+    player_screen(player, time_left)
 
-        if result in ["win", "lose", "time"]:
-            EndingScreen.endingScreenHandler(canvas, GameData.paths["backgroundImage"][background_index[result]], lambda: PlayerScreen.playerScreenHandler(
-                canvas, window, GameData.paths["backgroundImage"][background_index[next_player]], GameData.paths["icons"][3],
-                GameData.backgroundColors[next_player], 15, 0, 0, 0, next_player))
-        else:
-            PlayerScreen.playerScreenHandler(canvas, window, GameData.paths["backgroundImage"][background_index[next_player]], GameData.paths["icons"][3],
-                                             GameData.backgroundColors[next_player], 15, 0, 0, 0, next_player)
+def resume_time():
+    global timer_running, time_left
+    timer_running = True
+    canvas_cleaner_text("freeze_message")
+    update_timer(time_left)
 
-class Match:
-    @staticmethod
-    def matchHandler():
-        paths = GameData.paths
-        colors = GameData.backgroundColors
-        player1Background = paths["backgroundImage"][1]
-        player2Background = paths["backgroundImage"][2]
-        clockIcon = paths["icons"][3]
-        PlayerScreen.playerScreenHandler(main_canvas.canvas, game_window.window, player1Background, clockIcon, colors["player1"], 15, 0, 0, 0, "player1")
+def end_round(result):
+    global current_question_index, current_player, timer_running, time_left
+    canvas_cleaner()
+    
+    if result == "win":
+        background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
+    elif result == "lose":
+        background_image = tk.PhotoImage(file=paths["backgroundImage"][4])
+    elif result == "time_out":
+        background_image = tk.PhotoImage(file=paths["backgroundImage"][3])
+        players[current_player]["points"] -= 1  # Deduz um ponto se o tempo acabar
+    elif result == "protected":
+        background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
+    
+    canvas.background_image = background_image  # Prevent garbage collection
+    canvas.create_image(0, 0, anchor="nw", image=background_image)
+    
+    timer_running = False
+    current_player = "player2" if current_player == "player1" else "player1"
+    current_question_index = (current_question_index + 1) % len(questions)
+    time_left = 15  # Reseta o tempo para a próxima rodada
+    
+    window.after(2000, lambda: player_screen(current_player, time_left))
 
-class InicialMenu:
-    def __init__(self):
-        window = game_window.window
-        canvas = main_canvas.canvas
-        paths = GameData.paths
-        backgroundImage = tk.PhotoImage(file=paths["backgroundImage"][0])
-        canvas.backgroundImage = backgroundImage  # Referência para evitar coleta de lixo
-        canvas.create_image(0, 0, anchor="nw", image=backgroundImage)
-        playButtonImage = tk.PhotoImage(file=paths["icons"][0])
-        playButton = tk.Button(window, image=playButtonImage, bd=0, activebackground="#004AAD", background="#004AAD", command=Match.matchHandler)
-        playButton.image = playButtonImage  # Referência para evitar coleta de lixo
-        canvas.create_window(500, 350, anchor="nw", window=playButton)
+def start_game():
+    player_screen("player1", time_left)
 
-if __name__ == "__main__":
-    game_window = GameWindow()
-    main_canvas = MainCanvas(game_window.window)
-    inicial_menu = InicialMenu()
-    game_window.window.mainloop()
+# Menu inicial
+background_image = tk.PhotoImage(file=paths["backgroundImage"][0])
+canvas.background_image = background_image  # Prevent garbage collection
+canvas.create_image(0, 0, anchor="nw", image=background_image)
+
+play_button_image = tk.PhotoImage(file=paths["icons"][0])
+play_button = tk.Button(window, image=play_button_image, bd=0, activebackground="#004AAD", background="#004AAD", command=start_game)
+play_button.image = play_button_image  # Prevent garbage collection
+canvas.create_window(500, 350, anchor="nw", window=play_button)
+
+window.mainloop()
+
+
+
+
+
+
