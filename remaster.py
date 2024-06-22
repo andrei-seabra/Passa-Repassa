@@ -16,8 +16,8 @@ canvas.pack(fill="both", expand=True)
 
 # Dados do jogo
 questions_answers = {
-    "Quem descobriu o Brasil?": "pedro álvares cabral",
-    "Qual o maior time do futebol brasileiro?": "flamengo"
+    "Quem descobriu o Brasil?": "a",
+    "Qual o maior time do futebol brasileiro?": "a"
 }
 
 # Referências de imagens
@@ -173,7 +173,7 @@ def give_random_power(player):
     players[player]["inv"][power] += 1
 
 def use_power_up(player, power):
-    global timer_running, timer_id, time_left, original_time_left, power_up_index
+    global timer_running, timer_id, time_left, original_time_left, power_up_index, power_up_quantity_id
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
@@ -181,29 +181,28 @@ def use_power_up(player, power):
             power_up_index = 1
         elif power == 'timeFreezer':
             if not players[player]['time_freeze_active']:
-                power_up_index = 3
                 players[player]['time_freeze_active'] = True
+                power_up_index = 3
                 original_time_left = time_left  # Armazena o tempo original
                 time_left = 5999  # Define tempo para 999 segundos
                 canvas.after_cancel(timer_id)
                 timer_running = True
                 update_timer(time_left)
         elif power == 'doublePoints':
-            power_up_index = 2
             players[player]['double_points_active'] = True
+            power_up_index = 2
         update_player_inventory(player)
 
 def update_player_inventory(player):
-    global power_up_index, power_up_quantity_id
+    global power_up_index
     # Atualiza apenas o inventário do jogador sem reiniciar a tela
     icons_positions = [(935, 583), (1035, 583), (1135, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
     for i, power_name in enumerate(power_names):
-        canvas.itemconfig(power_up_quantity_id, text=f"x{players[player]['inv'][power_name]}")
-
         power_up_image = tk.PhotoImage(file=paths["icons"][power_up_index])  # Ícone do relógio (Clock.png)
         canvas.power_up_image = power_up_image  # Prevent garbage collection
         power_up_used = canvas.create_image(142, 135, anchor="nw", image=power_up_image)
+        canvas.itemconfig(power_up_quantity_id, text=f"x{players[player]['inv'][power_name]}") # atualiza o número de poderes
     
 def resume_time():
     global timer_running, time_left
