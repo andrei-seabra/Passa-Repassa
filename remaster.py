@@ -36,7 +36,8 @@ paths = {
         "Assets/Images/Shield.png",
         "Assets/Images/Rocket.png",
         "Assets/Images/Clock.png",
-        "Assets/Images/SubmitArrow.png"
+        "Assets/Images/SubmitArrow.png",
+        "Assets/Images/Cross.png"
     ]
 }
 
@@ -127,7 +128,7 @@ def player_screen(player, time_left):
     canvas.create_window(799, 368, anchor="nw", window=submit_button)
     
     # Add power up buttons and quantities
-    icons_positions = [(930, 583), (1035, 583), (1140, 583)]
+    icons_positions = [(931, 583), (1035, 583), (1143, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
     for i, icon in enumerate(paths["icons"][1:4]):
         power_name = power_names[i]
