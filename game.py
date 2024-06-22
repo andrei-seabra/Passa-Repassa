@@ -276,7 +276,7 @@ def end_round(result):
     
     timer_running = False
     current_player = "player2" if current_player == "player1" else "player1"
-    current_question_index = (current_question_index + 1) % len(questions)
+    current_question_index = random.randint(0, len(questions) - 1)
     time_left = 15  # Reseta o tempo para a próxima rodada
     original_time_left = 15  # Reseta o tempo original para a próxima rodada
     
