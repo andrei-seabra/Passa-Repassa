@@ -77,6 +77,7 @@ questions = list(questions_answers.keys())
 time_left = 15
 timer_running = True
 timer_id = None
+original_time_left = 15  # Variável para armazenar o tempo original
 
 def canvas_cleaner():
     widgets = canvas.find_all()
@@ -89,7 +90,8 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def player_screen(player, time_left):
-    global timer_running
+    global timer_running, original_time_left
+    original_time_left = time_left
     timer_running = True
     canvas_cleaner()
     
@@ -124,8 +126,9 @@ def player_screen(player, time_left):
     
     # Add power up buttons and quantities
     icons_positions = [(930, 583), (1035, 583), (1140, 583)]
+    power_names = ['shield', 'doublePoints', 'timeFreezer']
     for i, icon in enumerate(paths["icons"][1:4]):
-        power_name = list(players[player]['inv'].keys())[i]
+        power_name = power_names[i]
         power_up_image = tk.PhotoImage(file=icon)
         power_up_button = tk.Button(window, image=power_up_image, bd=0, activebackground="#0A3A7B", background="#0A3A7B", command=lambda p=player, pw=power_name: use_power_up(p, pw))
         power_up_button.image = power_up_image  # Prevent garbage collection
@@ -171,7 +174,7 @@ def give_random_power(player):
     players[player]["inv"][power] += 1
 
 def use_power_up(player, power):
-    global timer_running, timer_id
+    global timer_running, timer_id, time_left, original_time_left
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
@@ -179,24 +182,31 @@ def use_power_up(player, power):
         elif power == 'timeFreezer':
             if not players[player]['time_freeze_active']:
                 players[player]['time_freeze_active'] = True
-                timer_running = False
+                original_time_left = time_left  # Armazena o tempo original
+                time_left = 999  # Define tempo para 999 segundos
                 canvas.after_cancel(timer_id)
-                canvas.create_text(640, 360, anchor="center", font=("System", 32), fill="red", text="Tempo Congelado!", tag="freeze_message")
+                timer_running = True
+                update_timer(time_left)
         elif power == 'doublePoints':
             players[player]['double_points_active'] = True
         update_player_inventory(player)
 
 def update_player_inventory(player):
-    player_screen(player, time_left)
-
+    # Atualiza apenas o inventário do jogador sem reiniciar a tela
+    icons_positions = [(930, 583), (1035, 583), (1140, 583)]
+    power_names = ['shield', 'doublePoints', 'timeFreezer']
+    for i, power_name in enumerate(power_names):
+        power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+    
 def resume_time():
     global timer_running, time_left
     timer_running = True
+    time_left = original_time_left  # Restaura o tempo original
     canvas_cleaner_text("freeze_message")
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left
+    global current_question_index, current_player, timer_running, time_left, original_time_left
     canvas_cleaner()
     
     if result == "win":
@@ -216,6 +226,7 @@ def end_round(result):
     current_player = "player2" if current_player == "player1" else "player1"
     current_question_index = (current_question_index + 1) % len(questions)
     time_left = 15  # Reseta o tempo para a próxima rodada
+    original_time_left = 15  # Reseta o tempo original para a próxima rodada
     
     window.after(2000, lambda: player_screen(current_player, time_left))
 
@@ -233,9 +244,5 @@ play_button.image = play_button_image  # Prevent garbage collection
 canvas.create_window(500, 350, anchor="nw", window=play_button)
 
 window.mainloop()
-
-
-
-
 
 
