@@ -1,1 +1,0 @@
-Baixe a pasta "PassaRepassa" e coloque em um lugar de preferência em sua máquina, porém, favor, jamais retirar quaisquer arquivos dessa pasta para não quebrar o código devido às referências das imagens utilizadas no jogo. Para mais orientações, abra a pasta "Assets", e novamente abra outra pasta, chamada "References".
