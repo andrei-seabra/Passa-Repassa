@@ -79,6 +79,7 @@ questions = list(questions_answers.keys())
 time_left = 15
 timer_running = True
 timer_id = None
+power_up_index = 5
 original_time_left = 15  # Variável para armazenar o tempo original
 
 def canvas_cleaner():
@@ -92,14 +93,13 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def player_screen(player, time_left):
-    global timer_running, original_time_left
+    global timer_running, original_time_left, power_up_quantity_id
     original_time_left = time_left
     timer_running = True
     canvas_cleaner()
     
     # Add the background image
     bg_index = 1 if player == "player1" else 2
-    color_key = "player1" if player == "player1" else "player2"
     background_image = tk.PhotoImage(file=paths["backgroundImage"][bg_index])
     canvas.background_image = background_image  # Prevent garbage collection
     canvas.create_image(0, 0, anchor="nw", image=background_image)
@@ -111,11 +111,6 @@ def player_screen(player, time_left):
     canvas.create_text(1080, 75, anchor="nw", font=("System", 40), fill="#004AAD", text=str(players["player1"]["points"]))
     canvas.create_text(1125, 75, anchor="nw", font=("System", 40), fill="white", text="-")
     canvas.create_text(1150, 75, anchor="nw", font=("System", 40), fill="#D12424", text=str(players["player2"]["points"]))
-    
-    # Add power up display
-    power_up_image = tk.PhotoImage(file=paths["icons"][3])  # Ícone do relógio (Clock.png)
-    canvas.power_up_image = power_up_image  # Prevent garbage collection
-    canvas.create_image(142, 135, anchor="nw", image=power_up_image)
     
     # Add answer entry
     answer_entry = tk.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
@@ -130,6 +125,7 @@ def player_screen(player, time_left):
     # Add power up buttons and quantities
     icons_positions = [(931, 583), (1035, 583), (1143, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
+    color_key = "player1" if player == "player1" else "player2"
     for i, icon in enumerate(paths["icons"][1:4]):
         power_name = power_names[i]
         power_up_image = tk.PhotoImage(file=icon)
@@ -177,13 +173,15 @@ def give_random_power(player):
     players[player]["inv"][power] += 1
 
 def use_power_up(player, power):
-    global timer_running, timer_id, time_left, original_time_left
+    global timer_running, timer_id, time_left, original_time_left, power_up_index
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
             players[player]['shield_active'] = True
+            power_up_index = 1
         elif power == 'timeFreezer':
             if not players[player]['time_freeze_active']:
+                power_up_index = 3
                 players[player]['time_freeze_active'] = True
                 original_time_left = time_left  # Armazena o tempo original
                 time_left = 5999  # Define tempo para 999 segundos
@@ -191,15 +189,21 @@ def use_power_up(player, power):
                 timer_running = True
                 update_timer(time_left)
         elif power == 'doublePoints':
+            power_up_index = 2
             players[player]['double_points_active'] = True
         update_player_inventory(player)
 
 def update_player_inventory(player):
+    global power_up_index, power_up_quantity_id
     # Atualiza apenas o inventário do jogador sem reiniciar a tela
     icons_positions = [(935, 583), (1035, 583), (1135, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
     for i, power_name in enumerate(power_names):
-        power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+        canvas.itemconfig(power_up_quantity_id, text=f"x{players[player]['inv'][power_name]}")
+
+        power_up_image = tk.PhotoImage(file=paths["icons"][power_up_index])  # Ícone do relógio (Clock.png)
+        canvas.power_up_image = power_up_image  # Prevent garbage collection
+        power_up_used = canvas.create_image(142, 135, anchor="nw", image=power_up_image)
     
 def resume_time():
     global timer_running, time_left
