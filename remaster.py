@@ -195,7 +195,7 @@ def use_power_up(player, power):
 
 def update_player_inventory(player):
     # Atualiza apenas o inventário do jogador sem reiniciar a tela
-    icons_positions = [(930, 583), (1035, 583), (1140, 583)]
+    icons_positions = [(935, 583), (1035, 583), (1135, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
     for i, power_name in enumerate(power_names):
         power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
