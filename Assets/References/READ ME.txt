@@ -1,3 +1,0 @@
-Esses são os design finais de cada tela, porém não serão utilizados no jogo, apenas para se refenciar para o desenvolvimento do jogo, afinal de contas os textos serão modificados de acordo com a necessidade no jogo.
-
-Vídeo que ensina a utilizar canvas na biblioteca Tkinter: https://www.youtube.com/watch?v=WurCpmHtQc4&ab_channel=Codemy.com
