@@ -28,7 +28,8 @@ paths = {
         "Assets/Images/Player2Screen.png",
         "Assets/Images/TimeOutScreen.png",
         "Assets/Images/LoseScreen.png",
-        "Assets/Images/WinScreen.png"
+        "Assets/Images/WinScreen.png",
+        "Assets/Images/ProtectionScreen.png"
     ],
     "icons": [
         "Assets/Images/PlayButton.png",
@@ -41,8 +42,8 @@ paths = {
 
 # Referências de cores
 background_colors = {
-    "player1": "#004AAD",
-    "player2": "#D12424"
+    "player1": "#0A3A7B",
+    "player2": "#9D1C1C"
 }
 
 # Dados dos jogadores
@@ -97,6 +98,7 @@ def player_screen(player, time_left):
     
     # Add the background image
     bg_index = 1 if player == "player1" else 2
+    color_key = "player1" if player == "player1" else "player2"
     background_image = tk.PhotoImage(file=paths["backgroundImage"][bg_index])
     canvas.background_image = background_image  # Prevent garbage collection
     canvas.create_image(0, 0, anchor="nw", image=background_image)
@@ -130,7 +132,7 @@ def player_screen(player, time_left):
     for i, icon in enumerate(paths["icons"][1:4]):
         power_name = power_names[i]
         power_up_image = tk.PhotoImage(file=icon)
-        power_up_button = tk.Button(window, image=power_up_image, bd=0, activebackground="#0A3A7B", background="#0A3A7B", command=lambda p=player, pw=power_name: use_power_up(p, pw))
+        power_up_button = tk.Button(window, image=power_up_image, bd=0, activebackground=background_colors[color_key], background=background_colors[color_key], command=lambda p=player, pw=power_name: use_power_up(p, pw))
         power_up_button.image = power_up_image  # Prevent garbage collection
         canvas.create_window(icons_positions[i][0], icons_positions[i][1], anchor="nw", window=power_up_button)
         power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
@@ -183,7 +185,7 @@ def use_power_up(player, power):
             if not players[player]['time_freeze_active']:
                 players[player]['time_freeze_active'] = True
                 original_time_left = time_left  # Armazena o tempo original
-                time_left = 999  # Define tempo para 999 segundos
+                time_left = 5999  # Define tempo para 999 segundos
                 canvas.after_cancel(timer_id)
                 timer_running = True
                 update_timer(time_left)
@@ -217,7 +219,7 @@ def end_round(result):
         background_image = tk.PhotoImage(file=paths["backgroundImage"][3])
         players[current_player]["points"] -= 1  # Deduz um ponto se o tempo acabar
     elif result == "protected":
-        background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
+        background_image = tk.PhotoImage(file=paths["backgroundImage"][6])
     
     canvas.background_image = background_image  # Prevent garbage collection
     canvas.create_image(0, 0, anchor="nw", image=background_image)
@@ -244,5 +246,3 @@ play_button.image = play_button_image  # Prevent garbage collection
 canvas.create_window(500, 350, anchor="nw", window=play_button)
 
 window.mainloop()
-
-
