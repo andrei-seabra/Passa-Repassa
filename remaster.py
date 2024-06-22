@@ -217,7 +217,6 @@ def end_round(result):
         background_image = tk.PhotoImage(file=paths["backgroundImage"][4])
     elif result == "time_out":
         background_image = tk.PhotoImage(file=paths["backgroundImage"][3])
-        players[current_player]["points"] -= 1  # Deduz um ponto se o tempo acabar
     elif result == "protected":
         background_image = tk.PhotoImage(file=paths["backgroundImage"][6])
     
