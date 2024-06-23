@@ -166,7 +166,7 @@ def player_screen(player, time_left):
     
     # Add submit button
     submit_button_image = tk.PhotoImage(file=paths["icons"][4])
-    submit_button = tk.Button(window, image=submit_button_image, bd=0, activebackground="#A8A39B", background="#A8A39B", command=lambda: submit_answer)
+    submit_button = tk.Button(window, image=submit_button_image, bd=0, activebackground="#A8A39B", background="#A8A39B", command=lambda: submit_answer(None))
     submit_button.image = submit_button_image  # Prevent garbage collection
     canvas.create_window(799, 368, anchor="nw", window=submit_button)
     
