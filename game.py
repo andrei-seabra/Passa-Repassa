@@ -40,9 +40,7 @@ questions_answers = {
     "Quem foi Albert Einstein?": "físico",
     "Qual é a cor do cavalo branco de Napoleão?": "branco",
     "Quem pintou a Capela Sistina?": "michelangelo",
-    "Quantos jogadores compõem um time de futebol?": "11",
     "Quem foi Cleópatra?": "rainha do egito",
-    "Qual é o número de meses em um ano bissexto?": "12",
     "Quem descobriu a penicilina?": "alexander fleming",
     "Qual é o maior deserto do mundo?": "deserto do saara",
     "Qual é a capital da Espanha?": "madrid",
@@ -64,7 +62,11 @@ questions_answers = {
     "Qual é a capital da Argentina?": "buenos aires",
     "Quem inventou o avião?": "santos dumont",
     "Quantos anos tem um século?": "100",
-    "Quem descobriu o Brasil?": "pedro álvares cabral"
+    "Quem descobriu o Brasil?": "pedro álvares cabral",
+    "Qual é a capital do Japão?": "tóquio",
+    "Qual é a montanha mais alta do mundo?": "monte everest",
+    "Qual é o maior animal do mundo?": "baleia azul",
+    "Qual é o símbolo químico do ouro?": "au"
 }
 
 # Referências de imagens
