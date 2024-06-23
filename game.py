@@ -125,7 +125,7 @@ players = {
 }
 
 round = 0
-maxRound = 5
+maxRound = 20
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
