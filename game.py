@@ -125,7 +125,7 @@ players = {
 }
 
 round = 0
-maxRound = 5
+maxRound = 20
 power_up_index = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
@@ -146,7 +146,7 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def player_screen(player, time_left):
-    global timer_running, original_time_left, power_up_quantity_id, answer_entry, shield_quantity_id, double_points_quantity_id, time_freezer_quantity_id
+    global timer_running, original_time_left, power_up_quantity_id, answer_entry, shield_quantity_id, double_points_quantity_id, time_freezer_quantity_id, answer_entry
     original_time_left = time_left
     timer_running = True
     canvas_cleaner()
@@ -276,8 +276,9 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left, round, maxRound
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round, maxRound, answer_entry
     canvas_cleaner()
+    answer_entry.unbind("<Return>")
     round += 1
     if round <= maxRound:
         if result == "win":
