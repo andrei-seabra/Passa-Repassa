@@ -121,8 +121,8 @@ players = {
 }
 
 current_player = "player1"
-current_question_index = 0
 questions = list(questions_answers.keys())
+current_question_index = random.randint(0, len(questions) - 1)
 time_left = 15
 timer_running = True
 timer_id = None
