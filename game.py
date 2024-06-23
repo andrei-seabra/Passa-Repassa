@@ -27,7 +27,6 @@ questions_answers = {
     "Quem descobriu a gravidade?": "isaac newton",
     "Quantos oceanos existem na Terra?": "cinco",
     "Quem foi Leonardo da Vinci?": "pintor",
-    "Qual é a cor oposta ao vermelho no círculo cromático?": "verde",
     "Qual é a capital da França?": "paris",
     "Quem inventou a lâmpada elétrica?": "thomas edison",
     "Qual é a maior cordilheira do mundo?": "cordilheira dos andes",
@@ -127,7 +126,7 @@ players = {
 }
 
 round = 0
-maxRound = 20
+maxRound = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
@@ -148,7 +147,7 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def player_screen(player, time_left):
-    global timer_running, original_time_left, power_up_quantity_id, answer_entry
+    global timer_running, original_time_left, power_up_quantity_id, answer_entry, shield_quantity_id, double_points_quantity_id, time_freezer_quantity_id
     original_time_left = time_left
     timer_running = True
     canvas_cleaner()
@@ -188,8 +187,13 @@ def player_screen(player, time_left):
         power_up_button = tk.Button(window, image=power_up_image, bd=0, activebackground=background_colors[color_key], background=background_colors[color_key], command=lambda p=player, pw=power_name: use_power_up(p, pw))
         power_up_button.image = power_up_image  # Prevent garbage collection
         canvas.create_window(icons_positions[i][0], icons_positions[i][1], anchor="nw", window=power_up_button)
-        power_up_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
-    
+        if power_name == 'shield':
+            shield_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+        elif power_name == 'doublePoints':
+            double_points_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+        elif power_name == 'timeFreezer':
+            time_freezer_quantity_id = canvas.create_text(icons_positions[i][0] + 40, icons_positions[i][1] + 50, anchor="nw", font=("System", 20), fill="white", text=f"x{players[player]['inv'][power_name]}")
+
     update_timer(time_left)
 
 def update_timer(time_left):
@@ -230,6 +234,7 @@ def submit_answer(event):
 def give_random_power(player):
     power = random.choice(list(players[player]["inv"].keys()))
     players[player]["inv"][power] += 1
+    update_player_inventory(player)  # Atualiza o inventário do jogador ao receber um novo poder
 
 def use_power_up(player, power):
     global timer_running, timer_id, time_left, original_time_left, power_up_index
@@ -253,16 +258,12 @@ def use_power_up(player, power):
         update_player_inventory(player)
 
 def update_player_inventory(player):
-    global power_up_index, power_up_quantity_id
-    # Atualiza apenas o inventário do jogador sem reiniciar a tela
-    icons_positions = [(935, 583), (1035, 583), (1135, 583)]
-    power_names = ['shield', 'doublePoints', 'timeFreezer']
-    for i, power_name in enumerate(power_names):
-        power_up_image = tk.PhotoImage(file=paths["icons"][power_up_index])  # Ícone do relógio (Clock.png)
-        canvas.power_up_image = power_up_image  # Prevent garbage collection
-        power_up_used = canvas.create_image(142, 135, anchor="nw", image=power_up_image)
-        canvas.itemconfig(power_up_quantity_id, text=f"x{players[player]['inv'][power_name]}") # atualiza o número de poderes
-    
+    global shield_quantity_id, double_points_quantity_id, time_freezer_quantity_id, power_up_index
+    # Atualiza os textos de quantidade de poderes
+    canvas.itemconfig(shield_quantity_id, text=f"x{players[player]['inv']['shield']}")
+    canvas.itemconfig(double_points_quantity_id, text=f"x{players[player]['inv']['doublePoints']}")
+    canvas.itemconfig(time_freezer_quantity_id, text=f"x{players[player]['inv']['timeFreezer']}")
+
 def resume_time():
     global timer_running, time_left
     timer_running = True
@@ -319,8 +320,14 @@ def end_round(result):
         time_left = 15  # Reseta o tempo para a próxima rodada
         original_time_left = 15  # Reseta o tempo original para a próxima rodada
         round = 0 # Reseta o número de rodadas
-        players["player1"]["points"] = 0 # Reseta od pontos do player 1
-        players["player2"]["points"] = 0 # Reseta od pontos do player 2
+        for i, player in players.items(): # Reseta os pontos dos players
+            player['points'] = 0
+
+        for i, player in players.items(): # Reseta os poderes dos players
+            player['inv']['shield'] = 0
+            player['inv']['timeFreezer'] = 0
+            player['inv']['doublePoints'] = 0
+                
 
 def start_game():
     player_screen("player1", time_left)
