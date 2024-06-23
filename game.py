@@ -88,7 +88,6 @@ paths = {
         "Assets/Images/Rocket.png",
         "Assets/Images/Clock.png",
         "Assets/Images/SubmitArrow.png",
-        "Assets/Images/Cross.png",
         "Assets/Images/ResumeButton.png"
     ]
 }
@@ -127,13 +126,13 @@ players = {
 
 round = 0
 maxRound = 5
+power_up_index = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
 time_left = 15
 timer_running = True
 timer_id = None
-power_up_index = 5
 original_time_left = 15  # Variável para armazenar o tempo original
 
 def canvas_cleaner():
@@ -259,6 +258,11 @@ def use_power_up(player, power):
 
 def update_player_inventory(player):
     global shield_quantity_id, double_points_quantity_id, time_freezer_quantity_id, power_up_index
+    # adiciona o ícone do poder ativado
+    power_up_image = tk.PhotoImage(file=paths["icons"][power_up_index])  # Ícone do relógio (Clock.png)
+    canvas.power_up_image = power_up_image  # Prevent garbage collection
+    canvas.create_image(142, 135, anchor="nw", image=power_up_image)
+
     # Atualiza os textos de quantidade de poderes
     canvas.itemconfig(shield_quantity_id, text=f"x{players[player]['inv']['shield']}")
     canvas.itemconfig(double_points_quantity_id, text=f"x{players[player]['inv']['doublePoints']}")
@@ -309,7 +313,7 @@ def end_round(result):
         canvas.background_image = background_image  # Prevent garbage collection
         canvas.create_image(0, 0, anchor="nw", image=background_image)
 
-        resume_button_image = tk.PhotoImage(file=paths["icons"][6])
+        resume_button_image = tk.PhotoImage(file=paths["icons"][5])
         resume_button = tk.Button(window, image=resume_button_image, bd=0, activebackground=background_color, background=background_color, command=menuInicial)
         resume_button.image = resume_button_image  # Prevent garbage collection
         canvas.create_window(490, 500, anchor="nw", window=resume_button)
