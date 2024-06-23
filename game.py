@@ -230,7 +230,7 @@ def give_random_power(player):
     players[player]["inv"][power] += 1
 
 def use_power_up(player, power):
-    global timer_running, timer_id, time_left, original_time_left, power_up_index, power_up_quantity_id
+    global timer_running, timer_id, time_left, original_time_left, power_up_index
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
