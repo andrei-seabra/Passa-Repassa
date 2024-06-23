@@ -197,6 +197,7 @@ def canvas_cleaner_text(item):
     canvas.delete(item)
 
 def submit_answer(answer):
+    global current_player
     correct_answer = questions_answers[questions[current_question_index]]
     if answer.lower() == correct_answer:
         points_to_add = 2 if players[current_player]["double_points_active"] else 1
@@ -211,6 +212,7 @@ def submit_answer(answer):
     else:
         if players[current_player]["shield_active"]:
             players[current_player]["shield_active"] = False
+            current_player = "player2" if current_player == "player1" else "player1"
             end_round("protected")
         else:
             end_round("lose")
