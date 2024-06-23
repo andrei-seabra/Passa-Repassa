@@ -317,6 +317,8 @@ def end_round(result):
         time_left = 15  # Reseta o tempo para a próxima rodada
         original_time_left = 15  # Reseta o tempo original para a próxima rodada
         round = 0 # Reseta o número de rodadas
+        players["player1"]["points"] = 0 # Reseta od pontos do player 1
+        players["player2"]["points"] = 0 # Reseta od pontos do player 2
 
 def start_game():
     player_screen("player1", time_left)
