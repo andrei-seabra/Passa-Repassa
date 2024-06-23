@@ -41,7 +41,7 @@ questions_answers = {
     "Qual é a cor do cavalo branco de Napoleão?": "branco",
     "Quem pintou a Capela Sistina?": "michelangelo",
     "Quantos jogadores compõem um time de futebol?": "11",
-    "Quem foi Cleópatra?": "a última rainha do Egito",
+    "Quem foi Cleópatra?": "rainha do egito",
     "Qual é o número de meses em um ano bissexto?": "12",
     "Quem descobriu a penicilina?": "alexander fleming",
     "Qual é o maior deserto do mundo?": "deserto do saara",
@@ -53,7 +53,7 @@ questions_answers = {
     "Qual é a capital do Canadá?": "ottawa",
     "Quem descobriu a América?": "cristóvão colombo",
     "Qual é o segundo planeta do sistema solar?": "vênus",
-    "Quem foi Van Gogh?": "um pintor impressionista",
+    "Quem foi Van Gogh?": "pintor",
     "Qual é a cor da esmeralda?": "verde",
     "Quem criou a Teoria da Relatividade?": "albert einstein",
     "Quantos lados tem um octógono?": "8",
@@ -64,7 +64,7 @@ questions_answers = {
     "Qual é a capital da Argentina?": "buenos aires",
     "Quem inventou o avião?": "santos dumont",
     "Quantos anos tem um século?": "100",
-    "Quem descobriu o Brasil": "pedro álvares cabral"
+    "Quem descobriu o Brasil?": "pedro álvares cabral"
 }
 
 # Referências de imagens
