@@ -140,7 +140,7 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def player_screen(player, time_left):
-    global timer_running, original_time_left, power_up_quantity_id
+    global timer_running, original_time_left, power_up_quantity_id, answer_entry
     original_time_left = time_left
     timer_running = True
     canvas_cleaner()
@@ -161,11 +161,12 @@ def player_screen(player, time_left):
     
     # Add answer entry
     answer_entry = tk.Entry(window, border=0, bd=0, fg="black", font=("System", 20), highlightbackground="#FFF7EC", background="#FFF7EC")
+    answer_entry.bind("<Return>", submit_answer)
     canvas.create_window(465, 360, width=325, height=50, anchor="nw", window=answer_entry)
     
     # Add submit button
     submit_button_image = tk.PhotoImage(file=paths["icons"][4])
-    submit_button = tk.Button(window, image=submit_button_image, bd=0, activebackground="#A8A39B", background="#A8A39B", command=lambda: submit_answer(answer_entry.get()))
+    submit_button = tk.Button(window, image=submit_button_image, bd=0, activebackground="#A8A39B", background="#A8A39B", command=lambda: submit_answer)
     submit_button.image = submit_button_image  # Prevent garbage collection
     canvas.create_window(799, 368, anchor="nw", window=submit_button)
     
@@ -196,8 +197,9 @@ def update_timer(time_left):
 def canvas_cleaner_text(item):
     canvas.delete(item)
 
-def submit_answer(answer):
-    global current_player
+def submit_answer(event):
+    global current_player, answer_entry
+    answer = answer_entry.get()
     correct_answer = questions_answers[questions[current_question_index]]
     if answer.lower() == correct_answer:
         points_to_add = 2 if players[current_player]["double_points_active"] else 1
@@ -243,7 +245,7 @@ def use_power_up(player, power):
         update_player_inventory(player)
 
 def update_player_inventory(player):
-    global power_up_index
+    global power_up_index, power_up_quantity_id
     # Atualiza apenas o inventário do jogador sem reiniciar a tela
     icons_positions = [(935, 583), (1035, 583), (1135, 583)]
     power_names = ['shield', 'doublePoints', 'timeFreezer']
