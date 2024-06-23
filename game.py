@@ -87,7 +87,8 @@ paths = {
         "Assets/Images/Rocket.png",
         "Assets/Images/Clock.png",
         "Assets/Images/SubmitArrow.png",
-        "Assets/Images/Cross.png"
+        "Assets/Images/Cross.png",
+        "Assets/Images/ResumeButton.png"
     ]
 }
 
@@ -123,7 +124,8 @@ players = {
     }
 }
 
-round = 1
+round = 0
+maxRound = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
@@ -267,10 +269,10 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left, round
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round, maxRound
     canvas_cleaner()
     round += 1
-    if round <= 20:
+    if round <= maxRound:
         if result == "win":
             background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
         elif result == "lose":
@@ -293,27 +295,44 @@ def end_round(result):
     else:
         if players["player1"]["points"] > players["player2"]["points"]:
             background_image = tk.PhotoImage(file=paths["backgroundImage"][8])
+            background_color = "#004AAD"
         elif players["player1"]["points"] < players["player2"]["points"]:
             background_image = tk.PhotoImage(file=paths["backgroundImage"][9])
+            background_color = "#D12424"
         else:
             background_image = tk.PhotoImage(file=paths["backgroundImage"][7])
+            background_color = "#000000"
 
         canvas.background_image = background_image  # Prevent garbage collection
         canvas.create_image(0, 0, anchor="nw", image=background_image)
+
+        resume_button_image = tk.PhotoImage(file=paths["icons"][6])
+        resume_button = tk.Button(window, image=resume_button_image, bd=0, activebackground=background_color, background=background_color, command=menuInicial)
+        resume_button.image = resume_button_image  # Prevent garbage collection
+        canvas.create_window(490, 500, anchor="nw", window=resume_button)
     
         timer_running = False
+        current_player = "player1"
+        current_question_index = random.randint(0, len(questions) - 1)
+        time_left = 15  # Reseta o tempo para a próxima rodada
+        original_time_left = 15  # Reseta o tempo original para a próxima rodada
+        round = 0 # Reseta o número de rodadas
 
 def start_game():
     player_screen("player1", time_left)
 
 # Menu inicial
-background_image = tk.PhotoImage(file=paths["backgroundImage"][0])
-canvas.background_image = background_image  # Prevent garbage collection
-canvas.create_image(0, 0, anchor="nw", image=background_image)
+def menuInicial():
+    canvas_cleaner()
+    background_image = tk.PhotoImage(file=paths["backgroundImage"][0])
+    canvas.background_image = background_image  # Prevent garbage collection
+    canvas.create_image(0, 0, anchor="nw", image=background_image)
 
-play_button_image = tk.PhotoImage(file=paths["icons"][0])
-play_button = tk.Button(window, image=play_button_image, bd=0, activebackground="#004AAD", background="#004AAD", command=start_game)
-play_button.image = play_button_image  # Prevent garbage collection
-canvas.create_window(500, 350, anchor="nw", window=play_button)
+    play_button_image = tk.PhotoImage(file=paths["icons"][0])
+    play_button = tk.Button(window, image=play_button_image, bd=0, activebackground="#004AAD", background="#004AAD", command=start_game)
+    play_button.image = play_button_image  # Prevent garbage collection
+    canvas.create_window(500, 350, anchor="nw", window=play_button)
+
+menuInicial()
 
 window.mainloop()
