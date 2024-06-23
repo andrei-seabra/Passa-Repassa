@@ -76,7 +76,10 @@ paths = {
         "Assets/Images/TimeOutScreen.png",
         "Assets/Images/LoseScreen.png",
         "Assets/Images/WinScreen.png",
-        "Assets/Images/ProtectionScreen.png"
+        "Assets/Images/ProtectionScreen.png",
+        "Assets/Images/DrawScreen.png",
+        "Assets/Images/Player1WinScreen.png",
+        "Assets/Images/Player2WinScreen.png"
     ],
     "icons": [
         "Assets/Images/PlayButton.png",
@@ -288,7 +291,13 @@ def end_round(result):
     
         window.after(2000, lambda: player_screen(current_player, time_left))
     else:
-        background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
+        if players["player1"]["points"] > players["player2"]["points"]:
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][8])
+        elif players["player1"]["points"] < players["player2"]["points"]:
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][9])
+        else:
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][7])
+
         canvas.background_image = background_image  # Prevent garbage collection
         canvas.create_image(0, 0, anchor="nw", image=background_image)
     
