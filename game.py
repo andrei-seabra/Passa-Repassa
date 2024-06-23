@@ -120,6 +120,7 @@ players = {
     }
 }
 
+round = 1
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
@@ -263,28 +264,35 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round
     canvas_cleaner()
+    round += 1
+    if round <= 20:
+        if result == "win":
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
+        elif result == "lose":
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][4])
+        elif result == "time_out":
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][3])
+        elif result == "protected":
+            background_image = tk.PhotoImage(file=paths["backgroundImage"][6])
     
-    if result == "win":
+        canvas.background_image = background_image  # Prevent garbage collection
+        canvas.create_image(0, 0, anchor="nw", image=background_image)
+    
+        timer_running = False
+        current_player = "player2" if current_player == "player1" else "player1"
+        current_question_index = random.randint(0, len(questions) - 1)
+        time_left = 15  # Reseta o tempo para a próxima rodada
+        original_time_left = 15  # Reseta o tempo original para a próxima rodada
+    
+        window.after(2000, lambda: player_screen(current_player, time_left))
+    else:
         background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
-    elif result == "lose":
-        background_image = tk.PhotoImage(file=paths["backgroundImage"][4])
-    elif result == "time_out":
-        background_image = tk.PhotoImage(file=paths["backgroundImage"][3])
-    elif result == "protected":
-        background_image = tk.PhotoImage(file=paths["backgroundImage"][6])
+        canvas.background_image = background_image  # Prevent garbage collection
+        canvas.create_image(0, 0, anchor="nw", image=background_image)
     
-    canvas.background_image = background_image  # Prevent garbage collection
-    canvas.create_image(0, 0, anchor="nw", image=background_image)
-    
-    timer_running = False
-    current_player = "player2" if current_player == "player1" else "player1"
-    current_question_index = random.randint(0, len(questions) - 1)
-    time_left = 15  # Reseta o tempo para a próxima rodada
-    original_time_left = 15  # Reseta o tempo original para a próxima rodada
-    
-    window.after(2000, lambda: player_screen(current_player, time_left))
+        timer_running = False
 
 def start_game():
     player_screen("player1", time_left)
