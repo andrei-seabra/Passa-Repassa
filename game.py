@@ -212,7 +212,7 @@ def submit_answer(event):
         if players[current_player]["time_freeze_active"]:
             players[current_player]["time_freeze_active"] = False
             resume_time()  # Reinicia o temporizador se congelado
-        if players[current_player]["points"] >= players["player2"]["points"]:
+        if players[current_player]["points"] >= players["player2"]["points"] or players[current_player]["points"] < players["player2"]["points"]:
             players[current_player]["points"] += points_to_add
         players[current_player]["double_points_active"] = False
         give_random_power(current_player)
