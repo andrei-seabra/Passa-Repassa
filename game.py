@@ -214,6 +214,7 @@ def submit_answer(event):
     correct_answer = questions_answers[questions[current_question_index]]
     if answer.lower() == correct_answer:
         points_to_add = 2 if players[current_player]["double_points_active"] else 1
+        players[current_player]["shield_active"] = False # Reseta o poder de escudo caso o player acerte
         if players[current_player]["time_freeze_active"]:
             players[current_player]["time_freeze_active"] = False
             resume_time()  # Reinicia o temporizador se congelado
