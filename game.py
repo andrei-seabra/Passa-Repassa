@@ -157,15 +157,16 @@ players = {
 }
 
 round = 0
-maxRound = 20
+max_round = 20
 power_up_index = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
 current_question_index = random.randint(0, len(questions) - 1)
-time_left = 15
+max_time = 30
+time_left = max_time
 timer_running = True
 timer_id = None
-original_time_left = 15  # Variável para armazenar o tempo original
+original_time_left = 30  # Variável para armazenar o tempo original
 
 def canvas_cleaner():
     widgets = canvas.find_all()
@@ -309,11 +310,11 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left, round, maxRound, answer_entry
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time
     canvas_cleaner()
     answer_entry.unbind("<Return>")
     round += 1
-    if round <= maxRound:
+    if round <= max_round:
         if result == "win":
             background_image = tk.PhotoImage(file=paths["backgroundImage"][5])
         elif result == "lose":
@@ -329,8 +330,8 @@ def end_round(result):
         timer_running = False
         current_player = "player2" if current_player == "player1" else "player1"
         current_question_index = random.randint(0, len(questions) - 1)
-        time_left = 15  # Reseta o tempo para a próxima rodada
-        original_time_left = 15  # Reseta o tempo original para a próxima rodada
+        time_left = max_time  # Reseta o tempo para a próxima rodada
+        original_time_left = max_time  # Reseta o tempo original para a próxima rodada
     
         window.after(2000, lambda: player_screen(current_player, time_left))
     else:
@@ -355,8 +356,8 @@ def end_round(result):
         timer_running = False
         current_player = "player1"
         current_question_index = random.randint(0, len(questions) - 1)
-        time_left = 15  # Reseta o tempo para a próxima rodada
-        original_time_left = 15  # Reseta o tempo original para a próxima rodada
+        time_left = max_time  # Reseta o tempo para a próxima rodada
+        original_time_left = max_time  # Reseta o tempo original para a próxima rodada
         round = 0 # Reseta o número de rodadas
         for i, player in players.items(): # Reseta os pontos dos players
             player['points'] = 0
