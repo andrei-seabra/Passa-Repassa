@@ -150,8 +150,9 @@ max_round = 20
 power_up_index = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
-current_question_index = random.randint(0, len(questions) - 1)
-max_time = 30 # variável que controla quanto tempo cada rodada tem
+questions_clone = questions
+current_question_index = random.randint(0, len(questions_clone) - 1)
+max_time = 25 # variável que controla quanto tempo cada rodada tem
 time_left = max_time
 timer_running = True
 timer_id = None
@@ -299,8 +300,10 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time, questions_clone, questions_answers
     canvas_cleaner()
+    if current_question_index in questions_clone:
+        del questions_clone[current_question_index] # Remove a pergunta que foi feita na rodada
     answer_entry.unbind("<Return>")
     round += 1
     if round <= max_round:
@@ -321,6 +324,7 @@ def end_round(result):
         current_question_index = random.randint(0, len(questions) - 1)
         time_left = max_time  # Reseta o tempo para a próxima rodada
         original_time_left = max_time  # Reseta o tempo original para a próxima rodada
+        questions_clone = questions_answers # Reseta o dictionary de perguntas e respostas
     
         window.after(2000, lambda: player_screen(current_player, time_left))
     else:
