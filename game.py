@@ -51,7 +51,7 @@ questions_answers = {
     "Quantos lados tem um hexágono?": "6",
     "Quantos ovos têm em uma dúzia?": "12",
     "Está gostando do jogo?": "sim",
-    "Qual é o país mais populoso?": "china",
+    "Qual é o país mais populoso?": "índia",
     "Qual é o nome do presidente do país?": "lula",
     "Qual a cor da banana madura?": "amarelo",
     "Qual animal é o rei da selva?": "leão",
@@ -150,8 +150,8 @@ max_round = 20
 power_up_index = 5
 current_player = "player1"
 questions = list(questions_answers.keys())
-questions_clone = questions
-current_question_index = random.randint(0, len(questions_clone) - 1)
+deleted_questions = []
+current_question_index = random.randint(0, len(questions) - 1)
 max_time = 25 # variável que controla quanto tempo cada rodada tem
 time_left = max_time
 timer_running = True
@@ -235,7 +235,7 @@ def submit_answer(event):
     global current_player, answer_entry, timer_running
     answer = answer_entry.get()
     correct_answer = questions_answers[questions[current_question_index]]
-    timer_running = False # Para o tempo
+
     if answer.lower() == correct_answer:
         points_to_add = 2 if players[current_player]["double_points_active"] else 1
         players[current_player]["shield_active"] = False # Reseta o poder de escudo caso o player acerte
@@ -265,16 +265,18 @@ def use_power_up(player, power):
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
-            players[player]['shield_active'] = True
+            if round < max_round: # Verifica se não é a última rodada para ativar o poder
+                players[player]['shield_active'] = True
+            else:
+                players[player]['time_freeze_active'] = False 
             power_up_index = 1
         elif power == 'timeFreezer':
             if not players[player]['time_freeze_active']:
-                players[player]['time_freeze_active'] = True if round < max_round else players[player]['time_freeze_active'] = False # Verifica se não é a última rodada para ativar o poder
+                players[player]['time_freeze_active'] = True
                 power_up_index = 3
                 original_time_left = time_left  # Armazena o tempo original
-                time_left = 5999  # Define tempo para 999 segundos
                 canvas.after_cancel(timer_id)
-                timer_running = True
+                timer_running = False
                 update_timer(time_left)
         elif power == 'doublePoints':
             players[player]['double_points_active'] = True
@@ -301,11 +303,10 @@ def resume_time():
     update_timer(time_left)
 
 def end_round(result):
-    global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time, questions_clone, questions_answers
+    global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time, deleted_questions, questions
     canvas_cleaner()
-    if current_question_index in questions_clone:
-        print("deleted :", current_question_index)
-        del questions_clone[current_question_index] # Remove a pergunta que foi feita na rodada
+    timer_running = False # Para o tempo
+    deleted_questions.append(current_question_index)
     answer_entry.unbind("<Return>")
     round += 1
     if round <= max_round:
@@ -323,6 +324,8 @@ def end_round(result):
     
         current_player = "player2" if current_player == "player1" else "player1"
         current_question_index = random.randint(0, len(questions) - 1)
+        while current_question_index in questions: # Verifica enquanto não sair um novo índice
+            current_question_index = random.randint(0, len(questions) - 1)
         time_left = max_time  # Reseta o tempo para a próxima rodada
         original_time_left = max_time  # Reseta o tempo original para a próxima rodada
         questions_clone = questions_answers # Reseta o dictionary de perguntas e respostas
