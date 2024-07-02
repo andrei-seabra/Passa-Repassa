@@ -261,7 +261,7 @@ def give_random_power(player):
     update_player_inventory(player)  # Atualiza o inventário do jogador ao receber um novo poder
 
 def use_power_up(player, power):
-    global timer_running, timer_id, time_left, original_time_left, power_up_index, round
+    global timer_running, timer_id, time_left, original_time_left, power_up_index, round, max_round
     if players[player]['inv'][power] > 0:
         players[player]['inv'][power] -= 1
         if power == 'shield':
@@ -269,7 +269,7 @@ def use_power_up(player, power):
             power_up_index = 1
         elif power == 'timeFreezer':
             if not players[player]['time_freeze_active']:
-                players[player]['time_freeze_active'] = True if round < 30 else players[player]['time_freeze_active'] = False # Verifica se não é a última rodada para ativar o poder
+                players[player]['time_freeze_active'] = True if round < max_round else players[player]['time_freeze_active'] = False # Verifica se não é a última rodada para ativar o poder
                 power_up_index = 3
                 original_time_left = time_left  # Armazena o tempo original
                 time_left = 5999  # Define tempo para 999 segundos
