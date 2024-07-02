@@ -324,7 +324,7 @@ def end_round(result):
     
         current_player = "player2" if current_player == "player1" else "player1"
         current_question_index = random.randint(0, len(questions) - 1)
-        while current_question_index in questions: # Verifica enquanto não sair um novo índice
+        while current_question_index in deleted_questions: # Verifica enquanto não sair um novo índice
             current_question_index = random.randint(0, len(questions) - 1)
         time_left = max_time  # Reseta o tempo para a próxima rodada
         original_time_left = max_time  # Reseta o tempo original para a próxima rodada
