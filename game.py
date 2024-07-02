@@ -352,6 +352,7 @@ def end_round(result):
     
         timer_running = False
         current_player = "player1"
+        deleted_questions = [] # Reseta a lista de perguntas "deletadas"
         current_question_index = random.randint(0, len(questions) - 1)
         time_left = max_time  # Reseta o tempo para a próxima rodada
         original_time_left = max_time  # Reseta o tempo original para a próxima rodada
