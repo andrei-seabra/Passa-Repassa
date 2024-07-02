@@ -232,9 +232,10 @@ def canvas_cleaner_text(item):
     canvas.delete(item)
 
 def submit_answer(event):
-    global current_player, answer_entry
+    global current_player, answer_entry, timer_running
     answer = answer_entry.get()
     correct_answer = questions_answers[questions[current_question_index]]
+    timer_running = False # Para o tempo
     if answer.lower() == correct_answer:
         points_to_add = 2 if players[current_player]["double_points_active"] else 1
         players[current_player]["shield_active"] = False # Reseta o poder de escudo caso o player acerte
@@ -303,6 +304,7 @@ def end_round(result):
     global current_question_index, current_player, timer_running, time_left, original_time_left, round, max_round, answer_entry, max_time, questions_clone, questions_answers
     canvas_cleaner()
     if current_question_index in questions_clone:
+        print("deleted :", current_question_index)
         del questions_clone[current_question_index] # Remove a pergunta que foi feita na rodada
     answer_entry.unbind("<Return>")
     round += 1
@@ -319,7 +321,6 @@ def end_round(result):
         canvas.background_image = background_image  # Prevent garbage collection
         canvas.create_image(0, 0, anchor="nw", image=background_image)
     
-        timer_running = False
         current_player = "player2" if current_player == "player1" else "player1"
         current_question_index = random.randint(0, len(questions) - 1)
         time_left = max_time  # Reseta o tempo para a próxima rodada
